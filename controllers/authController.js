@@ -203,7 +203,8 @@ const register = async (req, res) => {
     last_name: user.last_name,
     address: user.address,
     contact: user.contact,
-    profileImage: user.profileImage
+    profileImage: user.profileImage,
+    isAdmin: user.isAdmin
   });
 };
 
@@ -246,7 +247,8 @@ const login = async (req, res) => {
     last_name: foundUser.last_name,
     address: foundUser.address,
     contact: foundUser.contact,
-    profileImage: foundUser.profileImage
+    profileImage: foundUser.profileImage,
+    isAdmin: foundUser.isAdmin
   });
 };
 
@@ -284,7 +286,8 @@ const refresh = (req, res) => {
         last_name: foundUser.last_name,
         address: foundUser.address,
         contact: foundUser.contact,
-        profileImage: foundUser.profileImage
+        profileImage: foundUser.profileImage,
+        isAdmin: foundUser.isAdmin
       });
     }
   );
