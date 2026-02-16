@@ -1,36 +1,37 @@
 const nodemailer = require("nodemailer");
 
-// التحقق من المتغيرات المطلوبة
-if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-  console.error("❌ EMAIL_USER or EMAIL_PASS is not set");
-}
-
+// Ethereal Email Configuration (مجاني 100%)
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.ethereal.email",
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
-  }
+  },
+  connectionTimeout: 10000,
+  socketTimeout: 10000,
 });
 
 // اختبار الاتصال عند بدء التطبيق
 transporter.verify((error, success) => {
   if (error) {
-    console.error("❌ Email configuration error:", error.message);
+    console.error("❌ Email service error:", error.message);
   } else {
-    console.log("✅ Email service is ready to send messages");
+    console.log("✅ Email service is ready (Ethereal)");
   }
 });
 
 const sendResetEmail = async (toEmail, resetLink) => {
   try {
-    // التحقق من البيانات
     if (!toEmail || !resetLink) {
       throw new Error("Missing email or resetLink");
     }
 
+    console.log("📧 Sending reset email to:", toEmail);
+
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: process.env.SENDER_EMAIL || process.env.EMAIL_USER,
       to: toEmail,
       subject: "Password Reset Request",
       html: `
@@ -43,11 +44,11 @@ const sendResetEmail = async (toEmail, resetLink) => {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log("✅ Email sent successfully:", info.response);
+    console.log("✅ Email sent successfully");
+    console.log("📨 Preview URL:", nodemailer.getTestMessageUrl(info));
     return { success: true, message: "Email sent successfully" };
   } catch (error) {
     console.error("❌ Error sending email:", error.message);
-    console.error("Full error:", error);
     throw error;
   }
 };
