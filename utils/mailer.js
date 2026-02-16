@@ -1,13 +1,13 @@
 const nodemailer = require("nodemailer");
 
-// Ethereal Email Configuration (مجاني 100%)
+// Brevo (Sendinblue) Configuration - مجاني 300 بريد/يوم
 const transporter = nodemailer.createTransport({
-  host: "smtp.ethereal.email",
+  host: "smtp-relay.brevo.com",
   port: 587,
   secure: false,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+    user: process.env.BREVO_LOGIN,  // a285e9001@smtp-brevo.com
+    pass: process.env.BREVO_API_KEY // 7IwZR62LFcHCnVPh
   },
   connectionTimeout: 10000,
   socketTimeout: 10000,
@@ -18,7 +18,7 @@ transporter.verify((error, success) => {
   if (error) {
     console.error("❌ Email service error:", error.message);
   } else {
-    console.log("✅ Email service is ready (Ethereal)");
+    console.log("✅ Email service is ready (Brevo)");
   }
 });
 
@@ -31,7 +31,7 @@ const sendResetEmail = async (toEmail, resetLink) => {
     console.log("📧 Sending reset email to:", toEmail);
 
     const mailOptions = {
-      from: process.env.SENDER_EMAIL || process.env.EMAIL_USER,
+      from: process.env.SENDER_EMAIL, // louayawadh5@gmail.com
       to: toEmail,
       subject: "Password Reset Request",
       html: `
@@ -44,8 +44,7 @@ const sendResetEmail = async (toEmail, resetLink) => {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log("✅ Email sent successfully");
-    console.log("📨 Preview URL:", nodemailer.getTestMessageUrl(info));
+    console.log("✅ Email sent successfully to:", toEmail);
     return { success: true, message: "Email sent successfully" };
   } catch (error) {
     console.error("❌ Error sending email:", error.message);
