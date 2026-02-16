@@ -159,40 +159,8 @@ exports.approveProduct = async (req, res) => {
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }
+  console.log("approveProduct called with reviews:", reviews);
 };
-
-// ➤ رفض منتج (مع حذف الصور والمنتج من DB)
-// exports.rejectProduct = async (req, res) => {
-//   try {
-//     const { reason } = req.body;
-//     const product = await Product.findById(req.params.id);
-//     if (!product)
-//       return res.status(404).json({ ok: false, error: "Product not found" });
-
-//     // حذف الصور من ImageKit
-//     const results = [];
-//     for (const fileId of product.imageFileIds) {
-//       try {
-//         await imageKit.deleteFile(fileId);
-//         results.push({ fileId, ok: true });
-//       } catch (err) {
-//         results.push({ fileId, ok: false, error: err.message });
-//       }
-//     }
-
-//     // حذف المنتج من MongoDB
-//     await Product.findByIdAndDelete(req.params.id);
-
-//     res.json({
-//       ok: true,
-//       message: "Product rejected and deleted",
-//       rejectionReason: reason,
-//       imageDeletion: results,
-//     });
-//   } catch (err) {
-//     res.status(500).json({ ok: false, error: err.message });
-//   }
-// };
 
 
 exports.rejectProduct = async (req, res) => {
@@ -213,6 +181,7 @@ exports.rejectProduct = async (req, res) => {
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }
+  console.log("rejectProduct called with reason:", reason);
 };
 
 // ➤ حذف منتج مباشرة (من MongoDB + الصور في ImageKit)
