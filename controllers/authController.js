@@ -451,21 +451,41 @@ const updateProfileImage = async (req, res) => {
 };
 
 const forgotPassword = async (req, res) => {
-  const { email } = req.body;
-  const user = await User.findOne({ email });
-  if (!user) return res.json({ message: "If the email is correct, you will receive a message" });
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
 
-  const rawToken = crypto.randomBytes(32).toString("hex");
-  const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex");
+    const user = await User.findOne({ email });
+    if (!user) {
+      // Security: Don't reveal if email exists
+      return res.json({ message: "If the email is correct, you will receive a message" });
+    }
 
-  user.resetToken = hashedToken;
-  user.resetTokenExpiry = Date.now() + 15 * 60 * 1000;
-  await user.save();
+    const rawToken = crypto.randomBytes(32).toString("hex");
+    const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex");
 
-  const resetLink = `${process.env.APP_URL}/reset-password?token=${rawToken}`;
-  await sendResetEmail(email, resetLink);
+    // Use environment variable for TTL, default to 15 minutes
+    const ttlMinutes = parseInt(process.env.RESET_TOKEN_TTL_MINUTES) || 15;
+    user.resetToken = hashedToken;
+    user.resetTokenExpiry = Date.now() + ttlMinutes * 60 * 1000;
+    await user.save();
 
-  res.json({ message: "A reset link has been sent to your email address" });
+    // Verify APP_URL is set
+    if (!process.env.APP_URL) {
+      console.error("❌ APP_URL is not set in environment variables");
+      return res.status(500).json({ message: "Server configuration error" });
+    }
+
+    const resetLink = `${process.env.APP_URL}/reset-password?token=${rawToken}`;
+    await sendResetEmail(email, resetLink);
+
+    res.json({ message: "A reset link has been sent to your email address" });
+  } catch (error) {
+    console.error("❌ Forgot password error:", error.message);
+    res.status(500).json({ message: "Error sending reset email" });
+  }
 };
 const resetPassword = async (req, res) => {
   try {
