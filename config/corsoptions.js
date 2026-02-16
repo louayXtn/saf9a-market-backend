@@ -19,15 +19,22 @@
 const allowedOrigins = require("./allowedOrigins");
 
 const corsOptions = {
-  origin: (origin, callback) => {
+  origin: function (origin, callback) {
+    console.log("🔍 CORS Origin request:", origin);
+    console.log("📋 Allowed Origins:", allowedOrigins);
+    
     // إذا الـ origin غير موجود (مثلاً Postman أو نفس الـ domain) → السماح
     if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, origin); // يرجّع نفس الـ origin المسموح
+      console.log("✅ Origin allowed");
+      callback(null, true);
     } else {
+      console.log("❌ Origin not allowed");
       callback(new Error("Not allowed by CORS"));
     }
   },
   credentials: true, // ضروري لإرسال الكوكيز مع الطلبات
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   optionsSuccessStatus: 200,
 };
 

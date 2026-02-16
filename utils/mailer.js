@@ -32,13 +32,13 @@ const sendResetEmail = async (toEmail, resetLink) => {
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: toEmail,
-      subject: "إعادة تعيين كلمة المرور",
+      subject: "Password Reset Request",
       html: `
-        <h2>طلب إعادة تعيين كلمة المرور</h2>
-        <p>اضغط على الرابط التالي لإعادة تعيين كلمة المرور:</p>
+        <h2>Password Reset Request</h2>
+        <p>Click the following link to reset your password:</p>
         <a href="${resetLink}">${resetLink}</a>
-        <p>الرابط صالح لمدة ${process.env.RESET_TOKEN_TTL_MINUTES || 15} دقيقة.</p>
-        <p><strong>ملاحظة:</strong> إذا لم تطلب إعادة تعيين كلمة المرور، تجاهل هذا البريد.</p>
+        <p>This link is valid for ${process.env.RESET_TOKEN_TTL_MINUTES || 15} minutes.</p>
+        <p><strong>Note:</strong> If you did not request a password reset, please ignore this email.</p>
       `
     };
 
